@@ -11,7 +11,7 @@ composer require ronolo/jsonquery
 ## Usage
 
 ```php
-use RoNoLo/JsonQuery;
+use RoNoLo\JsonQuery;
 
 $q = JsonQuery::fromFile('data.json'); // or ...
 $q = JsonQuery::fromData(['foo' => 1, 'bar' => 2]); // or ...
@@ -23,6 +23,8 @@ $result = $q->getNestedProperty('foo.2.bar'); // or ...
 $result = $q->getNestedProperty('foo.2.bar.0.name'); // or ...
 $result = $q->getNestedProperty('foo.bar.name'); // or ...
 ```
+
+Please check the PhpUnit tests, to find more examples. 
 
 ## Limitations
 
