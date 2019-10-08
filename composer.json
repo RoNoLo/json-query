@@ -1,0 +1,29 @@
+{
+  "name": "ronolo/jsonquery",
+  "description": "A json data parser",
+  "keywords": ["json", "data", "parser", "query"],
+  "license": "MIT",
+  "type": "library",
+  "homepage": "https://github.com/nahid/jsonq",
+  "require": {
+    "php": ">= 7.2",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "RoNoLo\\JsonQuery\\": [
+        "src/"
+      ]
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "RoNoLo\\JsonQuery\\": [
+        "tests/src/"
+      ]
+    }
+  }
+}

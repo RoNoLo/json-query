@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Pickett Burks"
+  },
+  {
+    "id": 1,
+    "name": "Cindy Stuart"
+  },
+  {
+    "id": 2
+  },
+  {
+    "id": 3,
+    "name": null,
+    "price": 100
+  }
+]
