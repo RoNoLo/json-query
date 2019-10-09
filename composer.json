@@ -5,6 +5,11 @@
   "license": "MIT",
   "type": "library",
   "homepage": "https://github.com/RoNoLo/jsonquery",
+  "authors": [
+    {
+      "name": "Ronald Locke"
+    }
+  ],
   "require": {
     "php": ">= 7.2",
     "ext-json": "*"
@@ -14,16 +19,12 @@
   },
   "autoload": {
     "psr-4": {
-      "RoNoLo\\JsonQuery\\": [
-        "src/"
-      ]
+      "RoNoLo\\JsonQuery\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "RoNoLo\\JsonQuery\\": [
-        "tests/src/"
-      ]
+      "RoNoLo\\JsonQuery\\": "tests/src/"
     }
   }
 }

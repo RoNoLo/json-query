@@ -67,6 +67,8 @@ class JsonQueryTest extends TestCase
             null,
             0x00,
             10 => 12,
+            "!" => "bernd",
+            "#bruh" => "foo"
         ];
 
         $q = JsonQuery::fromData($data);
@@ -88,6 +90,12 @@ class JsonQueryTest extends TestCase
 
         $acutally = $q->getNestedProperty("2");
         $this->assertEquals(0, $acutally);
+
+        $acutally = $q->getNestedProperty("!");
+        $this->assertEquals("bernd", $acutally);
+
+        $acutally = $q->getNestedProperty("#bruh");
+        $this->assertEquals("foo", $acutally);
     }
 
     /**
