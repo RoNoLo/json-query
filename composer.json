@@ -4,7 +4,7 @@
   "keywords": ["json", "data", "parser", "query"],
   "license": "MIT",
   "type": "library",
-  "homepage": "https://github.com/nahid/jsonq",
+  "homepage": "https://github.com/RoNoLo/jsonquery",
   "require": {
     "php": ">= 7.2",
     "ext-json": "*"
