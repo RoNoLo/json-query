@@ -48,7 +48,10 @@ class JsonQuery
         }
 
         if (is_string($field)) {
-            $parts = array_filter(explode('.', $field));
+            if (trim($field) == '') {
+                return $context;
+            }
+            $parts = explode('.', $field);
         } elseif (is_null($field)) {
             $parts = [];
         } else {
@@ -56,13 +59,13 @@ class JsonQuery
         }
 
         foreach ($parts as $idx => $part) {
+            if (trim($part) == '') {
+                return new ValueNotFound();
+            }
+
             // Will handle foo.2.bar querys
             if (is_numeric($part) && is_array($context)) {
                 return $this->getNestedProperty(array_slice($parts, $idx + 1), $context[intval($part)]);
-            }
-
-            if (trim($part) == '') {
-                return new ValueNotFound();
             }
 
             if (is_object($context)) {
