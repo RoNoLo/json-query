@@ -89,7 +89,6 @@ $result = $q->getNestedProperty('latlng.0'); // 51
 ```
 ## Limitations
 
-Because of the nature of multidimensional arrays querys which are very deep into the structure 
-can result in responses with multidimensional arrays. See example with 'persons.hobby.type' as 
-the query. 
+Because of the nature of multidimensional arrays querys which are very deep into the structure, the 
+result will be with multidimensional arrays. See example with 'persons.hobby.type' as the query. 
 

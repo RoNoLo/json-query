@@ -122,6 +122,22 @@ class JsonQueryTest extends TestCase
     {
         return [
             [
+                'valid/array_2dim_list.json',
+                'hobby.2.type',
+                [
+                    1 => "Movies",
+                ],
+            ],
+            [
+                'valid/array_2dim_list.json',
+                'name',
+                [
+                    "Peter",
+                    "Melanie",
+                    "Jim"
+                ],
+            ],
+            [
                 'valid/object_5dim.json',
                 'persons.hobby.type',
                 [

@@ -91,7 +91,11 @@ class JsonQuery
                     if ($res instanceof ValueNotFound) {
                         continue;
                     }
-                    $result[$i] = $res;
+                    if (is_array($res) && !count($res)) {
+                        ; //
+                    } else {
+                        $result[$i] = $res;
+                    }
                 }
                 return $result;
             } else {

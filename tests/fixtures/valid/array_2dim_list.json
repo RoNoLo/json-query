@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Peter",
+    "age": 12,
+    "hobby": [
+      {
+        "type": "Gaming",
+        "rating": 3
+      },
+      {
+        "type": "Music",
+        "rating": 5
+      }
+    ]
+  },
+  {
+    "name": "Melanie",
+    "age": 14,
+    "hobby": [
+      {
+        "type": "Dancing",
+        "rating": 2
+      },
+      {
+        "type": "Sport",
+        "rating": 4
+      },
+      {
+        "type": "Movies",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Jim",
+    "age": 11,
+    "hobby": [
+      {
+        "type": "Fighting",
+        "rating": 5
+      }
+    ]
+  }
+]
