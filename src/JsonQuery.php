@@ -14,9 +14,8 @@ class JsonQuery
 
     public static function fromData($data)
     {
-        // This will force Exceptions, when objects inside the data structure do not implement \JsonSerialize and
-        // will also force that array maps will be converted to objects, which is an internal requirement to work
-        // correctly with Json objects.
+        // This will force the data structure into the correct PHP representation of a JSON.
+        // JavaScript objects will be PHP objects, arrays will be numeric arrays.
         $json = json_encode($data);
 
         return self::fromJson($json);
@@ -45,9 +44,33 @@ class JsonQuery
         return self::fromJson($json);
     }
 
+    /**
+     * Use this method with caution. You can skip two encode/decode turns, which is
+     * a time saver. Use only with PHP data structures which are saved correctly.
+     *
+     * Example:
+     * You could do the following, to save correct PHP data, which will not fail with
+     * JsonQuery in the process later.
+     *
+     * $q = JsonQuery::fromJson('some JSON string');
+     * file_put_contents('foo.php', '<?php return ' . var_export($q->getData(), true) . ';');
+     *
+     * @param $data
+     * @return JsonQuery
+     */
+    public static function fromValidData($data)
+    {
+        return new self($data);
+    }
+
     protected function __construct($data)
     {
         $this->data = $data;
+    }
+
+    public function getData()
+    {
+        return $this->data;
     }
 
     public function getNestedProperty($field, &$context = null)
