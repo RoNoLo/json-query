@@ -3,6 +3,7 @@
 namespace RoNoLo\JsonQuery;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\Json;
 
 class JsonQueryTest extends TestCase
 {
@@ -107,6 +108,14 @@ class JsonQueryTest extends TestCase
 
         $acutally = $q->getNestedProperty("flo");
         $this->assertEquals(new \stdClass(), $acutally);
+    }
+
+    public function testWillThrowExceptionOnUnparsebleJson()
+    {
+        $this->expectException(InvalidJsonException::class);
+        $this->expectExceptionMessage('Syntax error');
+
+        JsonQuery::fromFile(__DIR__ . '/../fixtures/invalid/array_1dim.json');
     }
 
     public function canAccessPropertyProvider()

@@ -26,6 +26,15 @@ class JsonQuery
     {
         $data = json_decode($json);
 
+        if (is_null($data)) {
+            $error = json_last_error();
+            $message = json_last_error_msg();
+
+            if ($error !== JSON_ERROR_NONE) {
+                throw new InvalidJsonException($message, $error);
+            }
+        }
+
         return new self($data);
     }
 
