@@ -73,7 +73,7 @@ class JsonQuery
         return $this->data;
     }
 
-    public function getProperty($field, &$context = null)
+    public function &getPropertyReference($field, &$context = null)
     {
         if (!$context) {
             $context = $this->data;
@@ -101,7 +101,7 @@ class JsonQuery
                     return new ValueNotFound();
                 }
 
-                return $this->getProperty(array_slice($parts, $idx + 1), $context[intval($part)]);
+                return $this->getPropertyValue(array_slice($parts, $idx + 1), $context[intval($part)]);
             }
 
             if (is_object($context)) {
@@ -109,12 +109,12 @@ class JsonQuery
                     return new ValueNotFound();
                 }
 
-                $context = $context->{$part};
+                $context =& $context->{$part};
             } elseif (is_array($context)) {
                 $length = count($context);
                 $result = [];
                 for ($i = 0; $i < $length; $i++) {
-                    $res = $this->getProperty(array_slice($parts, $idx), $context[$i]);
+                    $res = $this->getPropertyValue(array_slice($parts, $idx), $context[$i]);
                     if ($res instanceof ValueNotFound) {
                         continue;
                     }
@@ -133,7 +133,67 @@ class JsonQuery
         return $context;
     }
 
-    public function setProperty($field, $value, &$context = null)
+    public function getPropertyValue($field, &$context = null)
+    {
+        if (!$context) {
+            $context = $this->data;
+        }
+
+        if (is_string($field)) {
+            if (trim($field) == '') {
+                return $context;
+            }
+            $parts = explode('.', $field);
+        } elseif (is_null($field)) {
+            $parts = [];
+        } else {
+            $parts = $field;
+        }
+
+        foreach ($parts as $idx => $part) {
+            if (trim($part) == '') {
+                return new ValueNotFound();
+            }
+
+            // Will handle foo.2.bar querys
+            if (is_numeric($part) && is_array($context)) {
+                if (!isset($context[intval($part)])) {
+                    return new ValueNotFound();
+                }
+
+                return $this->getPropertyValue(array_slice($parts, $idx + 1), $context[intval($part)]);
+            }
+
+            if (is_object($context)) {
+                if (!property_exists($context, $part)) {
+                    return new ValueNotFound();
+                }
+
+                $context = $context->{$part};
+            } elseif (is_array($context)) {
+                $length = count($context);
+                $result = [];
+                for ($i = 0; $i < $length; $i++) {
+                    $res = $this->getPropertyValue(array_slice($parts, $idx), $context[$i]);
+                    if ($res instanceof ValueNotFound) {
+                        continue;
+                    }
+                    if (is_array($res) && !count($res)) {
+                        ; //
+                    } else {
+                        $result[$i] = $res;
+                    }
+                }
+                return $result;
+            } else {
+                return new ValueNotFound();
+            }
+        }
+
+        return $context;
+    }
+
+    public function setPropertyValue($field, $value, &$context = null)
     {
         if (!$context) {
             $context =& $this->data;
@@ -161,16 +221,16 @@ class JsonQuery
                     return new ValueNotFound();
                 }
 
-                return $this->setProperty(array_slice($parts, $idx + 1), $value, $context[intval($part)]);
+                return $this->setPropertyValue(array_slice($parts, $idx + 1), $value, $context[intval($part)]);
             }
 
             if (is_object($context)) {
                 if (!property_exists($context, $part)) {
                     // Condition that we might go deeper in array or objects
-                    if ()
+                    // if ()
                     $context->{$part} = $value;
 
-                    return $this->setProperty(array_slice($parts, $idx + 1), $value, $context->{$part});
+                    return $this->setPropertyValue(array_slice($parts, $idx + 1), $value, $context->{$part});
                 }
 
                 $context = $context->{$part};
@@ -178,7 +238,7 @@ class JsonQuery
                 $length = count($context);
                 $result = [];
                 for ($i = 0; $i < $length; $i++) {
-                    $this->setProperty(array_slice($parts, $idx), $value, $context[$i]);
+                    $this->setPropertyValue(array_slice($parts, $idx), $value, $context[$i]);
                 }
                 return $result;
             } else {

@@ -19,7 +19,7 @@ class JsonQueryGetTest extends TestCase
     {
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
-        $actually = $q->getProperty($property);
+        $actually = $q->getPropertyValue($property);
 
         $this->assertEquals($expected, $actually);
     }
@@ -42,10 +42,10 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $actually = $q->getProperty("bernd flo");
+        $actually = $q->getPropertyValue("bernd flo");
         $this->assertEquals(1000, $actually);
 
-        $actually = $q->getProperty("heinz ron.gabriella barbara.b e");
+        $actually = $q->getPropertyValue("heinz ron.gabriella barbara.b e");
         $this->assertEquals([1 => 2], $actually);
     }
 
@@ -72,28 +72,28 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->getProperty("10");
+        $acutally = $q->getPropertyValue("10");
         $this->assertEquals(12, $acutally);
 
-        $acutally = $q->getProperty("bernd flo");
+        $acutally = $q->getPropertyValue("bernd flo");
         $this->assertEquals(1000, $acutally);
 
-        $acutally = $q->getProperty("bernd");
+        $acutally = $q->getPropertyValue("bernd");
         $this->assertEquals("heinz", $acutally);
 
-        $acutally = $q->getProperty("0");
+        $acutally = $q->getPropertyValue("0");
         $this->assertEquals(1, $acutally);
 
-        $acutally = $q->getProperty("1");
+        $acutally = $q->getPropertyValue("1");
         $this->assertEquals(null, $acutally);
 
-        $acutally = $q->getProperty("2");
+        $acutally = $q->getPropertyValue("2");
         $this->assertEquals(0, $acutally);
 
-        $acutally = $q->getProperty("!");
+        $acutally = $q->getPropertyValue("!");
         $this->assertEquals("bernd", $acutally);
 
-        $acutally = $q->getProperty("#bruh");
+        $acutally = $q->getPropertyValue("#bruh");
         $this->assertEquals("foo", $acutally);
     }
 
@@ -113,7 +113,7 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->getProperty("flo");
+        $acutally = $q->getPropertyValue("flo");
         $this->assertEquals(new \stdClass(), $acutally);
     }
 

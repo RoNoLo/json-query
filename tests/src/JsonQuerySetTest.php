@@ -21,9 +21,9 @@ class JsonQuerySetTest extends TestCase
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
         $context = null;
-        $q->setProperty($property, $value);
+        $q->setPropertyValue($property, $value);
 
-        $actually = $q->getProperty($property);
+        $actually = $q->getPropertyValue($property);
 
         $this->assertEquals($expected, $actually);
     }
