@@ -3,9 +3,8 @@
 namespace RoNoLo\JsonQuery;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Util\Json;
 
-class JsonQueryTest extends TestCase
+class JsonQueryGetTest extends TestCase
 {
     /**
      * This tests valid JSON data stored in fixture files.
@@ -20,7 +19,7 @@ class JsonQueryTest extends TestCase
     {
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
-        $actually = $q->getNestedProperty($property);
+        $actually = $q->getProperty($property);
 
         $this->assertEquals($expected, $actually);
     }
@@ -43,10 +42,10 @@ class JsonQueryTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $actually = $q->getNestedProperty("bernd flo");
+        $actually = $q->getProperty("bernd flo");
         $this->assertEquals(1000, $actually);
 
-        $actually = $q->getNestedProperty("heinz ron.gabriella barbara.b e");
+        $actually = $q->getProperty("heinz ron.gabriella barbara.b e");
         $this->assertEquals([1 => 2], $actually);
     }
 
@@ -73,28 +72,28 @@ class JsonQueryTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->getNestedProperty("10");
+        $acutally = $q->getProperty("10");
         $this->assertEquals(12, $acutally);
 
-        $acutally = $q->getNestedProperty("bernd flo");
+        $acutally = $q->getProperty("bernd flo");
         $this->assertEquals(1000, $acutally);
 
-        $acutally = $q->getNestedProperty("bernd");
+        $acutally = $q->getProperty("bernd");
         $this->assertEquals("heinz", $acutally);
 
-        $acutally = $q->getNestedProperty("0");
+        $acutally = $q->getProperty("0");
         $this->assertEquals(1, $acutally);
 
-        $acutally = $q->getNestedProperty("1");
+        $acutally = $q->getProperty("1");
         $this->assertEquals(null, $acutally);
 
-        $acutally = $q->getNestedProperty("2");
+        $acutally = $q->getProperty("2");
         $this->assertEquals(0, $acutally);
 
-        $acutally = $q->getNestedProperty("!");
+        $acutally = $q->getProperty("!");
         $this->assertEquals("bernd", $acutally);
 
-        $acutally = $q->getNestedProperty("#bruh");
+        $acutally = $q->getProperty("#bruh");
         $this->assertEquals("foo", $acutally);
     }
 
@@ -114,7 +113,7 @@ class JsonQueryTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->getNestedProperty("flo");
+        $acutally = $q->getProperty("flo");
         $this->assertEquals(new \stdClass(), $acutally);
     }
 
