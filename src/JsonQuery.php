@@ -68,184 +68,62 @@ class JsonQuery
         $this->data = $data;
     }
 
-    public function getData()
+    public function get($field, &$context = null)
     {
-        return $this->data;
-    }
-
-    public function &getPropertyReference($field, &$context = null)
-    {
-        if (!$context) {
-            $context = $this->data;
-        }
-
-        if (is_string($field)) {
-            if (trim($field) == '') {
-                return $context;
-            }
-            $parts = explode('.', $field);
-        } elseif (is_null($field)) {
-            $parts = [];
-        } else {
-            $parts = $field;
-        }
-
-        foreach ($parts as $idx => $part) {
-            if (trim($part) == '') {
-                return new ValueNotFound();
+        // Set Default Context.
+        while (true) {
+            if (!$context) {
+                $context = $this->data;
             }
 
-            // Will handle foo.2.bar querys
-            if (is_numeric($part) && is_array($context)) {
-                if (!isset($context[intval($part)])) {
-                    return new ValueNotFound();
+            // Field to Array, if needed.
+            if (is_string($field)) {
+                if (trim($field) == '') {
+                    return $context;
                 }
-
-                return $this->getPropertyValue(array_slice($parts, $idx + 1), $context[intval($part)]);
-            }
-
-            if (is_object($context)) {
-                if (!property_exists($context, $part)) {
-                    return new ValueNotFound();
-                }
-
-                $context =& $context->{$part};
-            } elseif (is_array($context)) {
-                $length = count($context);
-                $result = [];
-                for ($i = 0; $i < $length; $i++) {
-                    $res = $this->getPropertyValue(array_slice($parts, $idx), $context[$i]);
-                    if ($res instanceof ValueNotFound) {
-                        continue;
-                    }
-                    if (is_array($res) && !count($res)) {
-                        ; //
-                    } else {
-                        $result[$i] = $res;
-                    }
-                }
-                return $result;
+                $parts = explode('.', $field);
+            } elseif (is_null($field)) {
+                $parts = [];
             } else {
-                return new ValueNotFound();
-            }
-        }
-
-        return $context;
-    }
-
-    public function getPropertyValue($field, &$context = null)
-    {
-        if (!$context) {
-            $context = $this->data;
-        }
-
-        if (is_string($field)) {
-            if (trim($field) == '') {
-                return $context;
-            }
-            $parts = explode('.', $field);
-        } elseif (is_null($field)) {
-            $parts = [];
-        } else {
-            $parts = $field;
-        }
-
-        foreach ($parts as $idx => $part) {
-            if (trim($part) == '') {
-                return new ValueNotFound();
+                $parts = $field;
             }
 
-            // Will handle foo.2.bar querys
-            if (is_numeric($part) && is_array($context)) {
-                if (!isset($context[intval($part)])) {
-                    return new ValueNotFound();
-                }
-
-                return $this->getPropertyValue(array_slice($parts, $idx + 1), $context[intval($part)]);
-            }
-
-            if (is_object($context)) {
-                if (!property_exists($context, $part)) {
-                    return new ValueNotFound();
-                }
-
-                $context = $context->{$part};
-            } elseif (is_array($context)) {
-                $length = count($context);
-                $result = [];
-                for ($i = 0; $i < $length; $i++) {
-                    $res = $this->getPropertyValue(array_slice($parts, $idx), $context[$i]);
-                    if ($res instanceof ValueNotFound) {
-                        continue;
+            foreach ($parts as $i => $part) {
+                if (is_array($context) && !is_numeric($part)) {
+                    $orgContext =& $context;
+                    $result = [];
+                    for ($j = 0; $j < count($orgContext); $j++) {
+                        $res = $this->get(array_slice($parts, $i), $orgContext[$j]);
+                        if ($res instanceof ValueNotFound) {
+                            continue;
+                        }
+                        if (is_array($res) && !count($res)) {
+                            ; //
+                        } else {
+                            $result[$j] = $res;
+                        }
                     }
-                    if (is_array($res) && !count($res)) {
-                        ; //
-                    } else {
-                        $result[$i] = $res;
+
+                    return $result;
+                } elseif (is_array($context) && is_numeric($part)) {
+                    $part = intval($part);
+                    if (!isset($context[$part])) {
+                        return new ValueNotFound();
                     }
-                }
-                return $result;
-            } else {
-                return new ValueNotFound();
-            }
-        }
 
-        return $context;
-    }
+                    $context =& $context[$part];
+                } elseif (is_object($context)) {
+                    if (!property_exists($context, $part)) {
+                        return new ValueNotFound();
+                    }
 
-    public function setPropertyValue($field, $value, &$context = null)
-    {
-        if (!$context) {
-            $context =& $this->data;
-        }
-
-        if (is_string($field)) {
-            if (trim($field) == '') {
-                return $context;
-            }
-            $parts = explode('.', $field);
-        } elseif (is_null($field)) {
-            $parts = [];
-        } else {
-            $parts = $field;
-        }
-
-        foreach ($parts as $idx => $part) {
-            if (trim($part) == '') {
-                return new ValueNotFound();
-            }
-
-            // Will handle foo.2.bar querys
-            if (is_numeric($part) && is_array($context)) {
-                if (!isset($context[intval($part)])) {
+                    $context =& $context->{$part};
+                } else {
                     return new ValueNotFound();
                 }
-
-                return $this->setPropertyValue(array_slice($parts, $idx + 1), $value, $context[intval($part)]);
             }
 
-            if (is_object($context)) {
-                if (!property_exists($context, $part)) {
-                    // Condition that we might go deeper in array or objects
-                    // if ()
-                    $context->{$part} = $value;
-
-                    return $this->setPropertyValue(array_slice($parts, $idx + 1), $value, $context->{$part});
-                }
-
-                $context = $context->{$part};
-            } elseif (is_array($context)) {
-                $length = count($context);
-                $result = [];
-                for ($i = 0; $i < $length; $i++) {
-                    $this->setPropertyValue(array_slice($parts, $idx), $value, $context[$i]);
-                }
-                return $result;
-            } else {
-                return new ValueNotFound();
-            }
+            return $context;
         }
-
-        return $context;
     }
 }

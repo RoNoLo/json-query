@@ -19,7 +19,7 @@ class JsonQueryGetTest extends TestCase
     {
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
-        $actually = $q->getPropertyValue($property);
+        $actually = $q->get($property);
 
         $this->assertEquals($expected, $actually);
     }
@@ -42,10 +42,10 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $actually = $q->getPropertyValue("bernd flo");
+        $actually = $q->get("bernd flo");
         $this->assertEquals(1000, $actually);
 
-        $actually = $q->getPropertyValue("heinz ron.gabriella barbara.b e");
+        $actually = $q->get("heinz ron.gabriella barbara.b e");
         $this->assertEquals([1 => 2], $actually);
     }
 
@@ -72,28 +72,28 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->getPropertyValue("10");
+        $acutally = $q->get("10");
         $this->assertEquals(12, $acutally);
 
-        $acutally = $q->getPropertyValue("bernd flo");
+        $acutally = $q->get("bernd flo");
         $this->assertEquals(1000, $acutally);
 
-        $acutally = $q->getPropertyValue("bernd");
+        $acutally = $q->get("bernd");
         $this->assertEquals("heinz", $acutally);
 
-        $acutally = $q->getPropertyValue("0");
+        $acutally = $q->get("0");
         $this->assertEquals(1, $acutally);
 
-        $acutally = $q->getPropertyValue("1");
+        $acutally = $q->get("1");
         $this->assertEquals(null, $acutally);
 
-        $acutally = $q->getPropertyValue("2");
+        $acutally = $q->get("2");
         $this->assertEquals(0, $acutally);
 
-        $acutally = $q->getPropertyValue("!");
+        $acutally = $q->get("!");
         $this->assertEquals("bernd", $acutally);
 
-        $acutally = $q->getPropertyValue("#bruh");
+        $acutally = $q->get("#bruh");
         $this->assertEquals("foo", $acutally);
     }
 
@@ -113,7 +113,7 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->getPropertyValue("flo");
+        $acutally = $q->get("flo");
         $this->assertEquals(new \stdClass(), $acutally);
     }
 

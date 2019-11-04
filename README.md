@@ -1,6 +1,7 @@
 # JSON Query
 
-This library can be used to access JSON data with a document database (like MongoDB) like property access syntax.
+This library can be used to access JSON data with a document database (like MongoDB, CouchDB) 
+like property access syntax.
 
 ## Installation
 
