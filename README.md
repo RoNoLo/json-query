@@ -1,7 +1,8 @@
 # JSON Query
 
 This library can be used to access JSON data with a document database (like MongoDB, CouchDB) 
-like property access syntax.
+like property access syntax. It is NOT an exact Dot-Notion like approch to array structures. It
+(imho) needs a JSON array / object structure to work that way. 
 
 ## Installation
 
@@ -18,11 +19,11 @@ $q = JsonQuery::fromFile('data.json'); // or ...
 $q = JsonQuery::fromData(['foo' => 1, 'bar' => 2]); // or ...
 $q = JsonQuery::fromJson('{"foo": "bernd", "bar": "kitty"}');
 
-$result = $q->getNestedProperty('foo'); // or ...
-$result = $q->getNestedProperty('foo.bar'); // or ...
-$result = $q->getNestedProperty('foo.2.bar'); // or ...
-$result = $q->getNestedProperty('foo.2.bar.0.name'); // or ...
-$result = $q->getNestedProperty('foo.bar.name'); // or ...
+$result = $q->get('foo'); // or ...
+$result = $q->get('foo.bar'); // or ...
+$result = $q->get('foo.2.bar'); // or ...
+$result = $q->get('foo.2.bar.0.name'); // or ...
+$result = $q->get('foo.bar.name'); // or ...
 ```
 
 ## Examples
@@ -81,12 +82,12 @@ use RoNoLo\JsonQuery;
 
 $q = JsonQuery::fromFile('data.json');
 
-$result = $q->getNestedProperty('population'); // 80523700
-$result = $q->getNestedProperty('bernd'); // ValueNotFound()
-$result = $q->getNestedProperty('persons.name'); // ["Karl", "Jenni"]
-$result = $q->getNestedProperty('persons.1.name'); // "Jenni"
-$result = $q->getNestedProperty('latlng'); // [51, 9]
-$result = $q->getNestedProperty('latlng.0'); // 51
+$result = $q->get('population'); // 80523700
+$result = $q->get('bernd'); // ValueNotFound()
+$result = $q->get('persons.name'); // ["Karl", "Jenni"]
+$result = $q->get('persons.1.name'); // "Jenni"
+$result = $q->get('latlng'); // [51, 9]
+$result = $q->get('latlng.0'); // 51
 ```
 ## Limitations
 
