@@ -1,13 +1,28 @@
 # JSON Query
 
 This library can be used to access JSON data with a document database (like MongoDB, CouchDB) 
-like property access syntax. It is NOT an exact Dot-Notion like approch to array structures. It
-(imho) needs a JSON array / object structure to work that way. 
+like property query syntax. 
+
+It is NOT an exact Dot-Notion like approach to array structures. 
+It (imho) needs a JSON array / object structure to work that way. 
 
 ## Installation
 
-```
+```bash
 composer require ronolo/jsonquery
+```
+
+If that does not work, you may have to add the repository to the top level composer.json like this:
+
+```json
+{
+  "repositories": [
+     {
+        "type": "vcs",
+        "url":  "https://github.com/ronolo/jsonquery.git"
+    }
+  ]
+}
 ```
 
 ## Usage
@@ -30,8 +45,7 @@ $result = $q->get('foo.bar.name'); // or ...
 
 Please check the PhpUnit tests, to find more examples.
 
-```javascript
-// JSON to load
+```json
 {
   "de": "Deutschland", "en": "Germany", "es": "Alemania", "fr": "Allemagne",
   "it": "Germania", "ja": "\u30c9\u30a4\u30c4", "nl": "Duitsland",
@@ -91,6 +105,6 @@ $result = $q->get('latlng.0'); // 51
 ```
 ## Limitations
 
-Because of the nature of multidimensional arrays querys which are very deep into the structure, the 
-result will be with multidimensional arrays. See example with 'persons.hobby.type' as the query. 
+Because of the nature of multidimensional arrays queries which are very deep into the structure, the 
+result will be with multidimensional arrays. See PhpUnit example with 'persons.hobby.type' as the query. 
 

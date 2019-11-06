@@ -9,13 +9,31 @@ class JsonQueryGetTest extends TestCase
     /**
      * This tests valid JSON data stored in fixture files.
      *
-     * @dataProvider canAccessPropertyProvider
+     * @dataProvider canAccessPropertyFromObjectProvider
      *
      * @param $file
      * @param $property
      * @param $expected
      */
-    public function testCanAccessProperty($file, $property, $expected)
+    public function testCanAccessPropertyFromObject($file, $property, $expected)
+    {
+        $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
+
+        $actually = $q->get($property);
+
+        $this->assertEquals($expected, $actually);
+    }
+
+    /**
+     * This tests valid JSON data stored in fixture files.
+     *
+     * @dataProvider canAccessPropertyFromArrayProvider
+     *
+     * @param $file
+     * @param $property
+     * @param $expected
+     */
+    public function testCanAccessPropertyFromArray($file, $property, $expected)
     {
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
@@ -125,25 +143,9 @@ class JsonQueryGetTest extends TestCase
         JsonQuery::fromFile(__DIR__ . '/../fixtures/invalid/array_1dim.json');
     }
 
-    public function canAccessPropertyProvider()
+    public function canAccessPropertyFromObjectProvider()
     {
         return [
-            [
-                'valid/array_2dim_list.json',
-                'hobby.2.type',
-                [
-                    1 => "Movies",
-                ],
-            ],
-            [
-                'valid/array_2dim_list.json',
-                'name',
-                [
-                    "Peter",
-                    "Melanie",
-                    "Jim"
-                ],
-            ],
             [
                 'valid/object_5dim.json',
                 'persons.hobby.type',
@@ -186,6 +188,56 @@ class JsonQueryGetTest extends TestCase
                 51,
             ],
             [
+                'valid/object_1dim.json',
+                'fr',
+                'Allemagne'
+            ],
+            [
+                'valid/object_1dim.json',
+                'xx',
+                new ValueNotFound(),
+            ],
+        ];
+    }
+
+    public function canAccessPropertyFromArrayProvider()
+    {
+        return [
+            [
+                'valid/array_2dim_list.json',
+                'hobby.type',
+                [
+                    [
+                        "Gaming",
+                        "Music"
+                    ],
+                    [
+                        "Dancing",
+                        "Sport",
+                        "Movies"
+                    ],
+                    [
+                        "Fighting"
+                    ]
+                ],
+            ],
+            [
+                'valid/array_2dim_list.json',
+                'hobby.2.type',
+                [
+                    1 => "Movies",
+                ],
+            ],
+            [
+                'valid/array_2dim_list.json',
+                'name',
+                [
+                    "Peter",
+                    "Melanie",
+                    "Jim"
+                ],
+            ],
+            [
                 'valid/array_1dim_objects_mix.json',
                 'price.bernd',
                 [],
@@ -219,16 +271,6 @@ class JsonQueryGetTest extends TestCase
                     2 => 2,
                     3 => 3
                 ]
-            ],
-            [
-                'valid/object_1dim.json',
-                'fr',
-                'Allemagne'
-            ],
-            [
-                'valid/object_1dim.json',
-                'xx',
-                new ValueNotFound(),
             ],
             [
                 'valid/array_1dim.json',
