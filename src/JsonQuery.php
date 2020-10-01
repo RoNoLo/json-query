@@ -12,6 +12,15 @@ class JsonQuery
     /** @var mixed */
     protected $data;
 
+    /**
+     * Creates an JsonQuery object from a PHP structure.
+     *
+     * @param mixed $data
+     *
+     * @return JsonQuery
+     *
+     * @throws InvalidJsonException
+     */
     public static function fromData($data)
     {
         // This will force the data structure into the correct PHP representation of a JSON.
@@ -21,7 +30,16 @@ class JsonQuery
         return self::fromJson($json);
     }
 
-    public static function fromJson($json)
+    /**
+     * Creates a JsonQuery object from a JSON string.
+     *
+     * @param string $json
+     *
+     * @return JsonQuery
+     *
+     * @throws InvalidJsonException
+     */
+    public static function fromJson(string $json)
     {
         $data = json_decode($json);
 
@@ -37,7 +55,16 @@ class JsonQuery
         return new self($data);
     }
 
-    public static function fromFile($filePath)
+    /**
+     * Creates a JsonQuery from a text file, which needs to contain valid JSON.
+     *
+     * @param string $filePath
+     *
+     * @return JsonQuery
+     *
+     * @throws InvalidJsonException
+     */
+    public static function fromFile(string $filePath)
     {
         $json = file_get_contents($filePath);
 
@@ -45,6 +72,8 @@ class JsonQuery
     }
 
     /**
+     * Creates a JsonQuery from a *valid* PHP structure.
+     *
      * Use this method with caution. You can skip two encode/decode turns, which is
      * a time saver. Use only with PHP data structures which are saved correctly.
      *
@@ -55,7 +84,8 @@ class JsonQuery
      * $q = JsonQuery::fromJson('some JSON string');
      * file_put_contents('foo.php', '<?php return ' . var_export($q->getData(), true) . ';');
      *
-     * @param $data
+     * @param mixed $data
+     *
      * @return JsonQuery
      */
     public static function fromValidData($data)
@@ -68,7 +98,19 @@ class JsonQuery
         $this->data = $data;
     }
 
-    public function get($field, &$context = null)
+    /**
+     * Executes the query against the JSON PHP data structure.
+     *
+     * The return values can be very different. Any valid PHP/JSON structure
+     * is possible including null. If a field is not found a ValueNotFound object
+     * is returned.
+     *
+     * @param string $field
+     * @param null|mixed $context
+     *
+     * @return mixed
+     */
+    public function query(string $field, &$context = null)
     {
         // Set Default Context.
         while (true) {
@@ -93,7 +135,7 @@ class JsonQuery
                     $orgContext =& $context;
                     $result = [];
                     for ($j = 0; $j < count($orgContext); $j++) {
-                        $res = $this->get(array_slice($parts, $i), $orgContext[$j]);
+                        $res = $this->query(array_slice($parts, $i), $orgContext[$j]);
                         if ($res instanceof ValueNotFound) {
                             continue;
                         }

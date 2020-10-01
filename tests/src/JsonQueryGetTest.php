@@ -19,7 +19,7 @@ class JsonQueryGetTest extends TestCase
     {
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
-        $actually = $q->get($property);
+        $actually = $q->query($property);
 
         $this->assertEquals($expected, $actually);
     }
@@ -37,7 +37,7 @@ class JsonQueryGetTest extends TestCase
     {
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
-        $actually = $q->get($property);
+        $actually = $q->query($property);
 
         $this->assertEquals($expected, $actually);
     }
@@ -60,10 +60,10 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $actually = $q->get("bernd flo");
+        $actually = $q->query("bernd flo");
         $this->assertEquals(1000, $actually);
 
-        $actually = $q->get("heinz ron.gabriella barbara.b e");
+        $actually = $q->query("heinz ron.gabriella barbara.b e");
         $this->assertEquals([1 => 2], $actually);
     }
 
@@ -90,28 +90,28 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->get("10");
+        $acutally = $q->query("10");
         $this->assertEquals(12, $acutally);
 
-        $acutally = $q->get("bernd flo");
+        $acutally = $q->query("bernd flo");
         $this->assertEquals(1000, $acutally);
 
-        $acutally = $q->get("bernd");
+        $acutally = $q->query("bernd");
         $this->assertEquals("heinz", $acutally);
 
-        $acutally = $q->get("0");
+        $acutally = $q->query("0");
         $this->assertEquals(1, $acutally);
 
-        $acutally = $q->get("1");
+        $acutally = $q->query("1");
         $this->assertEquals(null, $acutally);
 
-        $acutally = $q->get("2");
+        $acutally = $q->query("2");
         $this->assertEquals(0, $acutally);
 
-        $acutally = $q->get("!");
+        $acutally = $q->query("!");
         $this->assertEquals("bernd", $acutally);
 
-        $acutally = $q->get("#bruh");
+        $acutally = $q->query("#bruh");
         $this->assertEquals("foo", $acutally);
     }
 
@@ -131,7 +131,7 @@ class JsonQueryGetTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->get("flo");
+        $acutally = $q->query("flo");
         $this->assertEquals(new \stdClass(), $acutally);
     }
 

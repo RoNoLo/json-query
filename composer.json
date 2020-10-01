@@ -1,10 +1,10 @@
 {
-  "name": "ronolo/jsonquery",
-  "description": "A json data parser",
+  "name": "ronolo/json-query",
+  "description": "A JSON data parser",
   "keywords": ["json", "data", "parser", "query"],
   "license": "MIT",
   "type": "library",
-  "homepage": "https://github.com/RoNoLo/jsonquery",
+  "homepage": "https://github.com/ronolo/json-query",
   "authors": [
     {
       "name": "Ronald Locke"

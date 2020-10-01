@@ -9,7 +9,7 @@ It (imho) needs a JSON array / object structure to work that way.
 ## Installation
 
 ```bash
-composer require ronolo/jsonquery
+composer require ronolo/json-query
 ```
 
 If that does not work, you may have to add the repository to the top level composer.json like this:
@@ -34,11 +34,11 @@ $q = JsonQuery::fromFile('data.json'); // or ...
 $q = JsonQuery::fromData(['foo' => 1, 'bar' => 2]); // or ...
 $q = JsonQuery::fromJson('{"foo": "bernd", "bar": "kitty"}');
 
-$result = $q->get('foo'); // or ...
-$result = $q->get('foo.bar'); // or ...
-$result = $q->get('foo.2.bar'); // or ...
-$result = $q->get('foo.2.bar.0.name'); // or ...
-$result = $q->get('foo.bar.name'); // or ...
+$result = $q->query('foo'); // or ...
+$result = $q->query('foo.bar'); // or ...
+$result = $q->query('foo.2.bar'); // or ...
+$result = $q->query('foo.2.bar.0.name'); // or ...
+$result = $q->query('foo.bar.name'); // or ...
 ```
 
 ## Examples
@@ -96,12 +96,12 @@ use RoNoLo\JsonQuery;
 
 $q = JsonQuery::fromFile('data.json');
 
-$result = $q->get('population'); // 80523700
-$result = $q->get('bernd'); // ValueNotFound()
-$result = $q->get('persons.name'); // ["Karl", "Jenni"]
-$result = $q->get('persons.1.name'); // "Jenni"
-$result = $q->get('latlng'); // [51, 9]
-$result = $q->get('latlng.0'); // 51
+$result = $q->query('population'); // 80523700
+$result = $q->query('bernd'); // ValueNotFound()
+$result = $q->query('persons.name'); // ["Karl", "Jenni"]
+$result = $q->query('persons.1.name'); // "Jenni"
+$result = $q->query('latlng'); // [51, 9]
+$result = $q->query('latlng.0'); // 51
 ```
 ## Limitations
 
