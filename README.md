@@ -19,7 +19,7 @@ If that does not work, you may have to add the repository to the top level compo
   "repositories": [
      {
         "type": "vcs",
-        "url":  "https://github.com/ronolo/jsonquery.git"
+        "url":  "https://github.com/ronolo/json-query.git"
     }
   ]
 }
