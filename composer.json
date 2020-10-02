@@ -1,6 +1,6 @@
 {
   "name": "ronolo/json-query",
-  "description": "A JSON data parser",
+  "description": "A JSON dot.notation parser to access values. Example: persons.2.hobby",
   "keywords": ["json", "data", "parser", "query"],
   "license": "MIT",
   "type": "library",
