@@ -105,12 +105,12 @@ class JsonQuery
      * is possible including null. If a field is not found a ValueNotFound object
      * is returned.
      *
-     * @param string $field
+     * @param $field
      * @param null|mixed $context
      *
      * @return mixed
      */
-    public function query(string $field, &$context = null)
+    public function query($field, &$context = null)
     {
         // Set Default Context.
         while (true) {

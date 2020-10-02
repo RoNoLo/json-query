@@ -4,7 +4,7 @@ namespace RoNoLo\JsonQuery;
 
 use PHPUnit\Framework\TestCase;
 
-class JsonQueryGetTest extends TestCase
+class JsonQueryTest extends TestCase
 {
     /**
      * This tests valid JSON data stored in fixture files.
