@@ -12,19 +12,6 @@ It (imho) needs a JSON array / object structure to work that way.
 composer require ronolo/json-query
 ```
 
-If that does not work, you may have to add the repository to the top level composer.json like this:
-
-```json
-{
-  "repositories": [
-     {
-        "type": "vcs",
-        "url":  "https://github.com/ronolo/json-query.git"
-    }
-  ]
-}
-```
-
 ## Usage
 
 ```php
@@ -38,7 +25,7 @@ $result = $q->query('foo'); // or ...
 $result = $q->query('foo.bar'); // or ...
 $result = $q->query('foo.2.bar'); // or ...
 $result = $q->query('foo.2.bar.0.name'); // or ...
-$result = $q->query('foo.bar.name'); // or ...
+$result = $q->query('foo.bar.name'); // etc.
 ```
 
 ## Examples
@@ -90,7 +77,7 @@ Please check the PhpUnit tests, to find more examples.
   ]
 }
 ```
- 
+
 ```php
 use RoNoLo\JsonQuery;
 
@@ -102,9 +89,9 @@ $result = $q->query('persons.name'); // ["Karl", "Jenni"]
 $result = $q->query('persons.1.name'); // "Jenni"
 $result = $q->query('latlng'); // [51, 9]
 $result = $q->query('latlng.0'); // 51
+$result = $q->query('persons.hobby.type'); // [["Cars", "Planes", "Music"],["Comics","Dancing"]]
 ```
 ## Limitations
 
-Because of the nature of multidimensional arrays queries which are very deep into the structure, the 
-result will be with multidimensional arrays. See PhpUnit example with 'persons.hobby.type' as the query. 
-
+Because of the nature of multidimensional arrays, queries which are very deep into the structure are possibly returned
+as multidimensional arrays. See PhpUnit example with 'persons.hobby.type' as the query. 

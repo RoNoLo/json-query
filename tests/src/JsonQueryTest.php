@@ -14,6 +14,7 @@ class JsonQueryTest extends TestCase
      * @param $file
      * @param $property
      * @param $expected
+     * @throws InvalidJsonException
      */
     public function testCanAccessPropertyFromObject($file, $property, $expected)
     {
@@ -32,6 +33,7 @@ class JsonQueryTest extends TestCase
      * @param $file
      * @param $property
      * @param $expected
+     * @throws InvalidJsonException
      */
     public function testCanAccessPropertyFromArray($file, $property, $expected)
     {
@@ -90,29 +92,29 @@ class JsonQueryTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->query("10");
-        $this->assertEquals(12, $acutally);
+        $actually = $q->query("10");
+        $this->assertEquals(12, $actually);
 
-        $acutally = $q->query("bernd flo");
-        $this->assertEquals(1000, $acutally);
+        $actually = $q->query("bernd flo");
+        $this->assertEquals(1000, $actually);
 
-        $acutally = $q->query("bernd");
-        $this->assertEquals("heinz", $acutally);
+        $actually = $q->query("bernd");
+        $this->assertEquals("heinz", $actually);
 
-        $acutally = $q->query("0");
-        $this->assertEquals(1, $acutally);
+        $actually = $q->query("0");
+        $this->assertEquals(1, $actually);
 
-        $acutally = $q->query("1");
-        $this->assertEquals(null, $acutally);
+        $actually = $q->query("1");
+        $this->assertEquals(null, $actually);
 
-        $acutally = $q->query("2");
-        $this->assertEquals(0, $acutally);
+        $actually = $q->query("2");
+        $this->assertEquals(0, $actually);
 
-        $acutally = $q->query("!");
-        $this->assertEquals("bernd", $acutally);
+        $actually = $q->query("!");
+        $this->assertEquals("bernd", $actually);
 
-        $acutally = $q->query("#bruh");
-        $this->assertEquals("foo", $acutally);
+        $actually = $q->query("#bruh");
+        $this->assertEquals("foo", $actually);
     }
 
     /**
