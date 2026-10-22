@@ -1,5 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace RoNoLo\JsonQuery;
 
-class InvalidJsonException extends \Exception {}
+use Exception;
+
+final class InvalidJsonException extends Exception
+{
+}

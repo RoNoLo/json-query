@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace RoNoLo\JsonQuery;
 
-class ClassWithoutJsonSerialize
+final class ClassWithoutJsonSerialize
 {
-    private $foo = 1000;
+    private int $foo = 1000;
 }

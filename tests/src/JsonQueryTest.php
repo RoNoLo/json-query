@@ -1,22 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace RoNoLo\JsonQuery;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class JsonQueryTest extends TestCase
+final class JsonQueryTest extends TestCase
 {
-    /**
-     * This tests valid JSON data stored in fixture files.
-     *
-     * @dataProvider canAccessPropertyFromObjectProvider
-     *
-     * @param $file
-     * @param $property
-     * @param $expected
-     * @throws InvalidJsonException
-     */
-    public function testCanAccessPropertyFromObject($file, $property, $expected)
+    #[DataProvider('canAccessPropertyFromObjectProvider')]
+    public function testCanAccessPropertyFromObject(string $file, string $property, mixed $expected): void
     {
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
@@ -25,17 +19,8 @@ class JsonQueryTest extends TestCase
         $this->assertEquals($expected, $actually);
     }
 
-    /**
-     * This tests valid JSON data stored in fixture files.
-     *
-     * @dataProvider canAccessPropertyFromArrayProvider
-     *
-     * @param $file
-     * @param $property
-     * @param $expected
-     * @throws InvalidJsonException
-     */
-    public function testCanAccessPropertyFromArray($file, $property, $expected)
+    #[DataProvider('canAccessPropertyFromArrayProvider')]
+    public function testCanAccessPropertyFromArray(string $file, string $property, mixed $expected): void
     {
         $q = JsonQuery::fromFile(__DIR__ . '/../fixtures/' . $file);
 
@@ -44,10 +29,7 @@ class JsonQueryTest extends TestCase
         $this->assertEquals($expected, $actually);
     }
 
-    /**
-     * This tests if properties with spaces in it will work.
-     */
-    public function testCanAccessPropertyWithSpaceInName()
+    public function testCanAccessPropertyWithSpaceInName(): void
     {
         $data = [
             "bernd flo" => 1000,
@@ -63,21 +45,13 @@ class JsonQueryTest extends TestCase
         $q = JsonQuery::fromData($data);
 
         $actually = $q->query("bernd flo");
-        $this->assertEquals(1000, $actually);
+        $this->assertSame(1000, $actually);
 
         $actually = $q->query("heinz ron.gabriella barbara.b e");
-        $this->assertEquals([1 => 2], $actually);
+        $this->assertSame([1 => 2], $actually);
     }
 
-    /**
-     * This tests if aweful data can be accessed.
-     *
-     * The thing is every PHP array or object given will be
-     * converted into json first. That means the array from the
-     * example will be converted into an JSON object and can be
-     * accessed.
-     */
-    public function testCanAccessPropertiesOfMixedData()
+    public function testCanAccessPropertiesOfMixedData(): void
     {
         $data = [
             "bernd flo" => 1000,
@@ -93,38 +67,31 @@ class JsonQueryTest extends TestCase
         $q = JsonQuery::fromData($data);
 
         $actually = $q->query("10");
-        $this->assertEquals(12, $actually);
+        $this->assertSame(12, $actually);
 
         $actually = $q->query("bernd flo");
-        $this->assertEquals(1000, $actually);
+        $this->assertSame(1000, $actually);
 
         $actually = $q->query("bernd");
-        $this->assertEquals("heinz", $actually);
+        $this->assertSame("heinz", $actually);
 
         $actually = $q->query("0");
-        $this->assertEquals(1, $actually);
+        $this->assertSame(1, $actually);
 
         $actually = $q->query("1");
-        $this->assertEquals(null, $actually);
+        $this->assertSame(null, $actually);
 
         $actually = $q->query("2");
-        $this->assertEquals(0, $actually);
+        $this->assertSame(0, $actually);
 
         $actually = $q->query("!");
-        $this->assertEquals("bernd", $actually);
+        $this->assertSame("bernd", $actually);
 
         $actually = $q->query("#bruh");
-        $this->assertEquals("foo", $actually);
+        $this->assertSame("foo", $actually);
     }
 
-    /**
-     * This tests if a PHP data array, which contains a class,
-     * which do not implement \JsonSerialize.
-     *
-     * Custom classes without the \JsonSerialize return an
-     * empty object, when json_encode().
-     */
-    public function testCanAcceptDataWithPhpCustomClass()
+    public function testCanAcceptDataWithPhpCustomClass(): void
     {
         $data = [
             "flo" => new ClassWithoutJsonSerialize(),
@@ -133,11 +100,11 @@ class JsonQueryTest extends TestCase
 
         $q = JsonQuery::fromData($data);
 
-        $acutally = $q->query("flo");
-        $this->assertEquals(new \stdClass(), $acutally);
+        $actually = $q->query("flo");
+        $this->assertEquals(new \stdClass(), $actually);
     }
 
-    public function testWillThrowExceptionOnUnparsebleJson()
+    public function testWillThrowExceptionOnUnparsebleJson(): void
     {
         $this->expectException(InvalidJsonException::class);
         $this->expectExceptionMessage('Syntax error');
@@ -145,7 +112,146 @@ class JsonQueryTest extends TestCase
         JsonQuery::fromFile(__DIR__ . '/../fixtures/invalid/array_1dim.json');
     }
 
-    public function canAccessPropertyFromObjectProvider()
+    public function testWillThrowExceptionOnNonExistentFile(): void
+    {
+        $this->expectException(InvalidJsonException::class);
+        $this->expectExceptionMessage('File "non_existent_file.json" could not be read.');
+
+        JsonQuery::fromFile('non_existent_file.json');
+    }
+
+    public function testWillThrowExceptionOnInvalidJsonString(): void
+    {
+        $this->expectException(InvalidJsonException::class);
+        $this->expectExceptionMessage('Syntax error');
+
+        JsonQuery::fromJson('{invalid json}');
+    }
+
+    public function testWillThrowExceptionOnUnencodableData(): void
+    {
+        $this->expectException(InvalidJsonException::class);
+
+        $resource = fopen('php://memory', 'r');
+        try {
+            JsonQuery::fromData(['stream' => $resource]);
+        } finally {
+            if (is_resource($resource)) {
+                fclose($resource);
+            }
+        }
+    }
+
+    public function testFromValidDataAndGetData(): void
+    {
+        $data = (object) ['foo' => 'bar'];
+        $q = JsonQuery::fromValidData($data);
+
+        $this->assertSame($data, $q->getData());
+        $this->assertSame('bar', $q->query('foo'));
+    }
+
+    public function testQueryWithNullFieldReturnsAllData(): void
+    {
+        $data = ['name' => 'John', 'age' => 30];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertEquals((object) $data, $q->query(null));
+    }
+
+    public function testQueryWithWhitespaceReturnsAllData(): void
+    {
+        $data = ['name' => 'John'];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertEquals((object) $data, $q->query('   '));
+    }
+
+    public function testQueryWithEmptyArrayReturnsAllData(): void
+    {
+        $data = ['name' => 'John'];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertEquals((object) $data, $q->query([]));
+    }
+
+    public function testQueryWithArrayOfFieldParts(): void
+    {
+        $data = [
+            'users' => [
+                ['name' => 'Alice'],
+                ['name' => 'Bob'],
+            ],
+        ];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertSame('Alice', $q->query(['users', 0, 'name']));
+        $this->assertSame('Bob', $q->query(['users', '1', 'name']));
+    }
+
+    public function testQueryWithIntegerOrFloat(): void
+    {
+        $data = ['first', 'second', 'third'];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertSame('first', $q->query(0));
+        $this->assertSame('second', $q->query(1));
+        $this->assertEquals(new ValueNotFound(), $q->query(99));
+    }
+
+    public function testQueryArrayContainingNullsDoesNotLoop(): void
+    {
+        $data = [
+            ['name' => 'Alice'],
+            null,
+            ['name' => 'Charlie'],
+        ];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertSame([0 => 'Alice', 2 => 'Charlie'], $q->query('name'));
+    }
+
+    public function testQueryArrayOfPrimitivesReturnsEmptyArrayWhenQueryingProperties(): void
+    {
+        $data = [1, 2, 3];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertSame([], $q->query('name'));
+    }
+
+    public function testQueryReturnsValueNotFoundOnScalarNestedProperty(): void
+    {
+        $data = ['number' => 42];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertEquals(new ValueNotFound(), $q->query('number.sub'));
+    }
+
+    public function testQueryReturnsValueNotFoundOnUnsupportedQueryType(): void
+    {
+        $data = ['name' => 'Alice'];
+        $q = JsonQuery::fromData($data);
+
+        $this->assertEquals(new ValueNotFound(), $q->query(true));
+        $this->assertEquals(new ValueNotFound(), $q->query(new \stdClass()));
+    }
+
+    public function testQueryPrimitiveJsonRoots(): void
+    {
+        $qInt = JsonQuery::fromJson('123');
+        $this->assertSame(123, $qInt->query(''));
+        $this->assertEquals(new ValueNotFound(), $qInt->query('foo'));
+
+        $qBool = JsonQuery::fromJson('true');
+        $this->assertTrue($qBool->query(''));
+        $this->assertEquals(new ValueNotFound(), $qBool->query('foo'));
+
+        $qNull = JsonQuery::fromJson('null');
+        $this->assertNull($qNull->query(''));
+        $this->assertEquals(new ValueNotFound(), $qNull->query('foo'));
+    }
+
+    public static function canAccessPropertyFromObjectProvider(): array
     {
         return [
             [
@@ -199,10 +305,20 @@ class JsonQueryTest extends TestCase
                 'xx',
                 new ValueNotFound(),
             ],
+            [
+                'valid/object_empty.json',
+                '',
+                new \stdClass(),
+            ],
+            [
+                'valid/object_empty.json',
+                'foo',
+                new ValueNotFound(),
+            ],
         ];
     }
 
-    public function canAccessPropertyFromArrayProvider()
+    public static function canAccessPropertyFromArrayProvider(): array
     {
         return [
             [
@@ -303,6 +419,26 @@ class JsonQueryTest extends TestCase
                     "Lelia Preston",
                     null
                 ]
+            ],
+            [
+                'valid/array_empty.json',
+                '',
+                [],
+            ],
+            [
+                'valid/array_empty.json',
+                '0',
+                new ValueNotFound(),
+            ],
+            [
+                'valid/array_empty.json',
+                'foo',
+                [],
+            ],
+            [
+                'valid/array_1dim_3objects_empty.json',
+                'name',
+                [],
             ],
         ];
     }

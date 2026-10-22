@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace RoNoLo\JsonQuery;
 
-/**
- * This class represents a query result where a given
- * value was queried but did not exist.
- */
-class ValueNotFound {}
+final readonly class ValueNotFound
+{
+}

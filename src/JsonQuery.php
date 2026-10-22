@@ -1,31 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace RoNoLo\JsonQuery;
 
-/**
- * JsonQuery
- *
- * @package RoNoLo\JsonQuery
- */
+use JsonException;
+
 class JsonQuery
 {
-    /** @var mixed */
-    protected $data;
-
     /**
-     * Creates an JsonQuery object from a PHP structure.
-     *
-     * @param mixed $data
-     *
-     * @return JsonQuery
+     * Creates a JsonQuery object from a PHP structure.
      *
      * @throws InvalidJsonException
      */
-    public static function fromData($data)
+    public static function fromData(mixed $data): self
     {
         // This will force the data structure into the correct PHP representation of a JSON.
         // JavaScript objects will be PHP objects, arrays will be numeric arrays.
-        $json = json_encode($data);
+        try {
+            $json = json_encode($data, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new InvalidJsonException($e->getMessage(), $e->getCode(), $e);
+        }
 
         return self::fromJson($json);
     }
@@ -33,23 +29,14 @@ class JsonQuery
     /**
      * Creates a JsonQuery object from a JSON string.
      *
-     * @param string $json
-     *
-     * @return JsonQuery
-     *
      * @throws InvalidJsonException
      */
-    public static function fromJson(string $json)
+    public static function fromJson(string $json): self
     {
-        $data = json_decode($json);
-
-        if (is_null($data)) {
-            $error = json_last_error();
-            $message = json_last_error_msg();
-
-            if ($error !== JSON_ERROR_NONE) {
-                throw new InvalidJsonException($message, $error);
-            }
+        try {
+            $data = json_decode($json, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new InvalidJsonException($e->getMessage(), $e->getCode(), $e);
         }
 
         return new self($data);
@@ -58,15 +45,15 @@ class JsonQuery
     /**
      * Creates a JsonQuery from a text file, which needs to contain valid JSON.
      *
-     * @param string $filePath
-     *
-     * @return JsonQuery
-     *
      * @throws InvalidJsonException
      */
-    public static function fromFile(string $filePath)
+    public static function fromFile(string $filePath): self
     {
-        $json = file_get_contents($filePath);
+        $json = @file_get_contents($filePath);
+
+        if ($json === false) {
+            throw new InvalidJsonException(sprintf('File "%s" could not be read.', $filePath));
+        }
 
         return self::fromJson($json);
     }
@@ -83,19 +70,20 @@ class JsonQuery
      *
      * $q = JsonQuery::fromJson('some JSON string');
      * file_put_contents('foo.php', '<?php return ' . var_export($q->getData(), true) . ';');
-     *
-     * @param mixed $data
-     *
-     * @return JsonQuery
      */
-    public static function fromValidData($data)
+    public static function fromValidData(mixed $data): self
     {
         return new self($data);
     }
 
-    protected function __construct($data)
+    protected function __construct(
+        protected mixed $data
+    ) {
+    }
+
+    public function getData(): mixed
     {
-        $this->data = $data;
+        return $this->data;
     }
 
     /**
@@ -104,68 +92,70 @@ class JsonQuery
      * The return values can be very different. Any valid PHP/JSON structure
      * is possible including null. If a field is not found a ValueNotFound object
      * is returned.
-     *
-     * @param $field
-     * @param null|mixed $context
-     *
-     * @return mixed
      */
-    public function query($field, &$context = null)
+    public function query(mixed $field): mixed
     {
-        // Set Default Context.
-        while (true) {
-            if (!$context) {
-                $context = $this->data;
-            }
+        return $this->queryInternal($field, $this->data);
+    }
 
-            // Field to Array, if needed.
-            if (is_string($field)) {
-                if (trim($field) == '') {
-                    return $context;
+    /**
+     * Internal recursive query method.
+     */
+    private function queryInternal(mixed $field, mixed $context): mixed
+    {
+        // Field to Array, if needed.
+        if (is_int($field) || is_float($field)) {
+            $parts = [(string) $field];
+        } elseif (is_string($field)) {
+            if (trim($field) === '') {
+                return $context;
+            }
+            $parts = explode('.', $field);
+        } elseif ($field === null) {
+            $parts = [];
+        } elseif (is_array($field)) {
+            $parts = $field;
+        } else {
+            return new ValueNotFound();
+        }
+
+        foreach ($parts as $i => $part) {
+            if (is_array($context) && !is_numeric($part)) {
+                $result = [];
+                $count = count($context);
+                for ($j = 0; $j < $count; $j++) {
+                    $res = $this->queryInternal(array_slice($parts, $i), $context[$j]);
+                    if ($res instanceof ValueNotFound) {
+                        continue;
+                    }
+                    if (is_array($res) && count($res) === 0) {
+                        // ignore empty array result
+                    } else {
+                        $result[$j] = $res;
+                    }
                 }
-                $parts = explode('.', $field);
-            } elseif (is_null($field)) {
-                $parts = [];
-            } else {
-                $parts = $field;
+
+                return $result;
             }
 
-            foreach ($parts as $i => $part) {
-                if (is_array($context) && !is_numeric($part)) {
-                    $orgContext =& $context;
-                    $result = [];
-                    for ($j = 0; $j < count($orgContext); $j++) {
-                        $res = $this->query(array_slice($parts, $i), $orgContext[$j]);
-                        if ($res instanceof ValueNotFound) {
-                            continue;
-                        }
-                        if (is_array($res) && !count($res)) {
-                            ; //
-                        } else {
-                            $result[$j] = $res;
-                        }
-                    }
-
-                    return $result;
-                } elseif (is_array($context) && is_numeric($part)) {
-                    $part = intval($part);
-                    if (!isset($context[$part])) {
-                        return new ValueNotFound();
-                    }
-
-                    $context =& $context[$part];
-                } elseif (is_object($context)) {
-                    if (!property_exists($context, $part)) {
-                        return new ValueNotFound();
-                    }
-
-                    $context =& $context->{$part};
-                } else {
+            if (is_array($context) && is_numeric($part)) {
+                $part = (int) $part;
+                if (!array_key_exists($part, $context)) {
                     return new ValueNotFound();
                 }
-            }
 
-            return $context;
+                $context = $context[$part];
+            } elseif (is_object($context)) {
+                if (!property_exists($context, (string) $part)) {
+                    return new ValueNotFound();
+                }
+
+                $context = $context->{(string) $part};
+            } else {
+                return new ValueNotFound();
+            }
         }
+
+        return $context;
     }
 }
